@@ -93,15 +93,7 @@ while True:
             
             pr = create_pr(optimized_yaml)
             console.print(f"[bold green]🎉 Pull Request created: [underline]{pr.html_url}[/underline][/bold green]")
-            merge_pr(pr)
-            
-            optimization_note = {
-                "timestamp": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "changes": "Optimized GitHub Actions for Carbon Efficiency",
-                "description": "AI-generated optimization to reduce emissions.",
-                "impact": "Reduced resource usage and emissions."
-            }
-            send_optimization_note(optimization_note)
+            # merge_pr(pr)
 
             last_checked_commit = latest_commit
 
