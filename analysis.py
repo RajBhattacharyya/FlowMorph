@@ -88,7 +88,7 @@ while True:
             
             console.print("[yellow]⚠️ Optimizing workflow...[/yellow]")
             original_yaml = repo.get_contents(workflow_path).decoded_content.decode()
-            optimized_yaml = optimize_workflow(original_yaml)
+            optimized_yaml = optimize_workflow(original_yaml, repo_name)
             console.print("[cyan]✅ AI has optimized the workflow.[/cyan]")
             
             pr = create_pr(optimized_yaml)
