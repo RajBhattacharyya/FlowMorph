@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
 from modules.commit_analysis import fetch_commit_details, get_latest_commit, is_bot_commit
-from modules.optimize_workflow import optimize_workflow
+from modules.optimize_workflow import optimize_workflow, improved_summary
 from modules.pr_analyse import create_pr, merge_pr
 
 load_dotenv()
@@ -89,9 +89,10 @@ while True:
             console.print("[yellow]⚠️ Optimizing workflow...[/yellow]")
             original_yaml = repo.get_contents(workflow_path).decoded_content.decode()
             optimized_yaml = optimize_workflow(original_yaml, repo_name)
+            summary = improved_summary(original_yaml, optimized_yaml)
             console.print("[cyan]✅ AI has optimized the workflow.[/cyan]")
             
-            pr = create_pr(optimized_yaml)
+            pr = create_pr(optimized_yaml, summary)
             console.print(f"[bold green]🎉 Pull Request created: [underline]{pr.html_url}[/underline][/bold green]")
             # merge_pr(pr)
 

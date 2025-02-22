@@ -10,7 +10,6 @@ from rich.console import Console
 llmk = os.getenv("API_KEY")
 console = Console()
 
-
 def optimize_workflow(original_yaml, repo_name):
     """Uses AI to optimize the GitHub Actions workflow, track emissions, and store records in Firebase."""
     try:
@@ -96,3 +95,35 @@ def optimize_workflow(original_yaml, repo_name):
     except Exception as e:
         console.print(f"[red]Error in workflow optimization: {e}[/red]")
         return original_yaml
+
+def improved_summary(original_yaml, optimized_yaml):
+    """Uses AI to summarize workflow improvements."""
+    try:
+        with Halo(text="AI generating optimization summary...", spinner="dots"):
+            client = Groq(api_key=llmk)
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"""
+                        Compare the following GitHub Actions workflows. Analyze the optimizations 
+                        and generate a structured summary of the improvements.
+
+                        **Original Workflow:**
+                        {original_yaml}
+
+                        **Optimized Workflow:**
+                        {optimized_yaml}
+
+                        Provide a concise, structured summary highlighting key changes.
+                        """,
+                    }
+                ],
+                model="llama-3.3-70b-versatile",
+            )
+            summary = chat_completion.choices[0].message.content
+            return summary.strip()
+
+    except Exception as e:
+        console.print(f"[red]Error generating optimization summary: {e}[/red]")
+        return "Could not generate a summary. Please review the changes manually."
