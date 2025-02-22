@@ -4,6 +4,8 @@ import os
 from rich.console import Console
 import time
 
+from modules.slack_bot import send_slack_notification
+
 github_token = os.getenv("GITHUB_TOKEN")
 g = Github(github_token)
 repo_name = "RajBhattacharyya/pv_app_api"
@@ -85,6 +87,8 @@ def create_pr(optimized_yaml, improvement_summary):
     #             f"[red]❌ Failed to create issue: {e.data.get('message', str(e))}[/red]"
     #         )
 
+    send_slack_notification(pr.html_url)
+    
     return pr
 
 
