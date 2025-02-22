@@ -3,8 +3,22 @@ from halo import Halo
 import os
 from rich.console import Console
 import time
-
+import pyrebase
 from modules.slack_bot import send_slack_notification
+
+# Initialize Firebase with existing config
+firebase_config = {
+    "apiKey": os.getenv("FAPIKEY"),
+    "authDomain": os.getenv("AUTHDOMAIN"),
+    "databaseURL": os.getenv("DATABASEURL"),
+    "projectId": os.getenv("PROJECTID"),
+    "storageBucket": os.getenv("STORAGEBUCKET"),
+    "messagingSenderId": os.getenv("MESSAGINGSENDERID"),
+    "appId": os.getenv("APPID"),
+    "measurementId": os.getenv("MEASUREMENTID"),
+}
+firebase = pyrebase.initialize_app(firebase_config)
+db = firebase.database()
 
 github_token = os.getenv("GITHUB_TOKEN")
 g = Github(github_token)
@@ -57,35 +71,9 @@ def create_pr(optimized_yaml, improvement_summary):
             head=branch_name,
             base="main",
         )
-
-    # with Halo(text="Creating a discussion issue...", spinner="dots"):
-    #     try:
-    #         issue = repo.create_issue(
-    #             title=f"Discussion: Optimization in {workflow_path}",
-    #             body=f"""
-    #             🚀 **New GitHub Actions Optimization Proposal** 🚀
-
-    #             **Why This Change?**  
-    #             {improvement_summary}  
-
-    #             **Summary of Changes:**  
-    #             - Optimized job execution  
-    #             - Reduced redundant steps  
-    #             - Improved overall efficiency  
-
-    #             **Next Steps:**  
-    #             Please review and share feedback before merging!  
-
-    #             🔗 [View the PR →]({pr.html_url})
-    #             """,
-    #         )
-    #         console.print(
-    #             f"[bold green]✅ Issue discussion opened: {issue.html_url}[/bold green]"
-    #         )
-    #     except GithubException as e:
-    #         console.print(
-    #             f"[red]❌ Failed to create issue: {e.data.get('message', str(e))}[/red]"
-    #         )
+        
+        # Update realtime PR status
+        db.child("has_new_pr").set(True)
 
     send_slack_notification(pr.html_url)
     
@@ -115,6 +103,8 @@ def merge_pr(pr):
         with Halo(text="Merging Pull Request...", spinner="dots"):
             try:
                 updated_pr.merge(commit_message="Merging AI-optimized workflow")
+                # Update realtime database when PR is merged
+                db.child("has_new_pr").set(False)
                 console.print(
                     f"[bold green]✅ PR Merged Successfully: {updated_pr.html_url}[/bold green]"
                 )
