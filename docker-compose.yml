@@ -4,18 +4,8 @@ services:
   flowmorph:
     build: .
     container_name: flowmorph_container
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - FAPIKEY=${FAPIKEY}
-      - AUTHDOMAIN=${AUTHDOMAIN}
-      - DATABASEURL=${DATABASEURL}
-      - PROJECTID=${PROJECTID}
-      - STORAGEBUCKET=${STORAGEBUCKET}
-      - MESSAGINGSENDERID=${MESSAGINGSENDERID}
-      - APPID=${APPID}
-      - MEASUREMENTID=${MEASUREMENTID}
-      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
-      - SLACK_CHANNEL=${SLACK_CHANNEL}
+    env_file:
+      - variables.env
     volumes:
       - .:/app
     ports:
